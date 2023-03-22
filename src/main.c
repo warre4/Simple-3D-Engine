@@ -18,9 +18,9 @@
 
 #define RGB_A_TO_RGBA(rgb, a)						(rgb << 8) | a
 #define RGBA_TO_RGB(rgba)							(UINT32)rgba >> 8
-#define CHANGE_RGB_VALUE(color, rgbHexCode)			color.rgbaCode = RGB_A_TO_RGBA(rgbHexCode, color.a)		// change RGB value of a Color variable (but keep the alpha value)
 
 //------------------------------------------------------------------------------
+
 typedef unsigned char Byte;
 
 typedef struct
@@ -31,15 +31,17 @@ typedef struct
 typedef struct
 {
 	int w, s, a, d;				//move up, down, left, right
-	int sl, sr;					//strafe left, right 
+	int sl, sr;					//strafe left, right
 	int m;						//move up, down, look up, down
 }Keys; Keys K;
 
 typedef union
 {
-	UINT32 rgbaCode;			// 4 byte color code e.g. 0xFFFFFFFF
-	struct { Byte a, b, g, r; };
-}Color;
+	Byte data[4];
+	struct { Byte r, g, b, a; };
+	struct { Byte x, y, z, w; };
+}Vec4_uint8;
+typedef Vec4_uint8 Color;
 
 enum HexCode
 {
@@ -54,6 +56,21 @@ enum HexCode
 	
 	DefaultBlue = 0x003C82
 };
+
+//------------------------------------------------------------------------------
+
+void SetColorRGBA(Color* pColor, UINT32 rgbaHexCode)
+{
+	pColor->r = rgbaHexCode >> (8 * 3);
+	pColor->g = 0x00FF0000 | rgbaHexCode >> (8 * 2);
+	pColor->b = 0x0000FF00 | rgbaHexCode >> (8 * 1);
+	pColor->a = 0x000000FF;
+}
+void SetColorRGB(Color* pColor, UINT32 rgbHexCode)
+{
+	SetColorRGBA(pColor, RGB_A_TO_RGBA(rgbHexCode, pColor->a));
+}
+
 //------------------------------------------------------------------------------
 
 void pixel(int x, int y, int c)			//draw a pixel at x/y with rgb
@@ -61,15 +78,15 @@ void pixel(int x, int y, int c)			//draw a pixel at x/y with rgb
 	Color color;
 	color.a = 0xFF;
 	
-	if (c == 0)	{ CHANGE_RGB_VALUE(color, Yellow		); }
-	if (c == 1)	{ CHANGE_RGB_VALUE(color, YellowDark	); }
-	if (c == 2)	{ CHANGE_RGB_VALUE(color, Green			); }
-	if (c == 3)	{ CHANGE_RGB_VALUE(color, GreenDark		); }
-	if (c == 4)	{ CHANGE_RGB_VALUE(color, Cyan			); }
-	if (c == 5)	{ CHANGE_RGB_VALUE(color, CyanDark		); }
-	if (c == 6)	{ CHANGE_RGB_VALUE(color, Brown			); }
-	if (c == 7)	{ CHANGE_RGB_VALUE(color, BrownDark		); }
-	if (c == 8) { CHANGE_RGB_VALUE(color, DefaultBlue	); }
+	if (c == 0)	{ SetColorRGB(&color, Yellow		); }
+	if (c == 1)	{ SetColorRGB(&color, YellowDark	); }
+	if (c == 2)	{ SetColorRGB(&color, Green			); }
+	if (c == 3)	{ SetColorRGB(&color, GreenDark		); }
+	if (c == 4)	{ SetColorRGB(&color, Cyan			); }
+	if (c == 5)	{ SetColorRGB(&color, CyanDark		); }
+	if (c == 6)	{ SetColorRGB(&color, Brown			); }
+	if (c == 7)	{ SetColorRGB(&color, BrownDark		); }
+	if (c == 8)	{ SetColorRGB(&color, DefaultBlue	); }
 
 	glColor3ub(color.r, color.g, color.b);
 	
