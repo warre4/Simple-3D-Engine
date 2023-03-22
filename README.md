@@ -4,6 +4,7 @@ A side project for fun inspired by the Doom Engine projects and videos from [3DS
 
 I wanted to do a C project and I found the techniques used in these videos intriguing so I'm gonna make my own version and play with it.
 
+This is also a good oppertunity to learn cmake so I'm using cmake for this project.
 
 
 ## Contributers
