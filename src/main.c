@@ -1,47 +1,78 @@
-//------------------------------------------------------------------------------
-//--------------------------Code By: 3DSage-------------------------------------
-//----------------Video tutorial on YouTube-3DSage------------------------------
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
+// -- This file started out as a copy from this one: https://github.com/3DSage/OpenGL-Starter_v1/blob/main/3DSage_Starter.c --
+// -- but is meant to change drastically -------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
 
 #include <math.h>
 #include <stdio.h>
 #include <GL/glut.h>
 
-#define res        1                        //0=160x120 1=360x240 4=640x480
-#define SW         160*res                  //screen width
-#define SH         120*res                  //screen height
-#define SW2        (SW/2)                   //half of screen width
-#define SH2        (SH/2)                   //half of screen height
-#define pixelScale 4/res                    //OpenGL pixel scale
-#define GLSW       (SW*pixelScale)          //OpenGL window width
-#define GLSH       (SH*pixelScale)          //OpenGL window height
+#define res											1														//0=160x120 1=360x240 4=640x480
+#define SW											160*res													//screen width
+#define SH											120*res													//screen height
+#define SW2											(SW/2)													//half of screen width
+#define SH2											(SH/2)													//half of screen height
+#define pixelScale									4/res													//OpenGL pixel scale
+#define GLSW										(SW*pixelScale)											//OpenGL window width
+#define GLSH										(SH*pixelScale)											//OpenGL window height
+
+#define RGB_A_TO_RGBA(rgb, a)						(rgb << 8) | a
+#define RGBA_TO_RGB(rgba)							(UINT32)rgba >> 8
+#define CHANGE_RGB_VALUE(color, rgbHexCode)			color.rgbaCode = RGB_A_TO_RGBA(rgbHexCode, color.a)		// change RGB value of a Color variable (but keep the alpha value)
+
 //------------------------------------------------------------------------------
-typedef struct
-{
-	int fr1, fr2;           //frame 1 frame 2, to create constant frame rate
-}time; time T;
+typedef unsigned char Byte;
 
 typedef struct
 {
-	int w, s, a, d;           //move up, down, left, right
-	int sl, sr;             //strafe left, right 
-	int m;                 //move up, down, look up, down
-}keys; keys K;
+	int fr1, fr2;				//frame 1 frame 2, to create constant frame rate
+}Time; Time T;
+
+typedef struct
+{
+	int w, s, a, d;				//move up, down, left, right
+	int sl, sr;					//strafe left, right 
+	int m;						//move up, down, look up, down
+}Keys; Keys K;
+
+typedef union
+{
+	UINT32 rgbaCode;			// 4 byte color code e.g. 0xFFFFFFFF
+	struct { Byte a, b, g, r; };
+}Color;
+
+enum HexCode
+{
+	Yellow = 0xFFFF00,
+	YellowDark = 0xA0A000,
+	Green = 0x00FF00,
+	GreenDark = 0x00A000,
+	Cyan = 0x00FFFF,
+	CyanDark = 0x00A0A0,
+	Brown = 0xA06400,
+	BrownDark = 0x6E3200,
+	
+	DefaultBlue = 0x003C82
+};
 //------------------------------------------------------------------------------
 
-void pixel(int x, int y, int c)                  //draw a pixel at x/y with rgb
+void pixel(int x, int y, int c)			//draw a pixel at x/y with rgb
 {
-	GLubyte rgb[3];
-	if (c == 0) { rgb[0] = 255; rgb[1] = 255; rgb[2] = 0; } //Yellow	
-	if (c == 1) { rgb[0] = 160; rgb[1] = 160; rgb[2] = 0; } //Yellow darker	
-	if (c == 2) { rgb[0] = 0; rgb[1] = 255; rgb[2] = 0; } //Green	
-	if (c == 3) { rgb[0] = 0; rgb[1] = 160; rgb[2] = 0; } //Green darker	
-	if (c == 4) { rgb[0] = 0; rgb[1] = 255; rgb[2] = 255; } //Cyan	
-	if (c == 5) { rgb[0] = 0; rgb[1] = 160; rgb[2] = 160; } //Cyan darker
-	if (c == 6) { rgb[0] = 160; rgb[1] = 100; rgb[2] = 0; } //brown	
-	if (c == 7) { rgb[0] = 110; rgb[1] = 50; rgb[2] = 0; } //brown darker
-	if (c == 8) { rgb[0] = 0; rgb[1] = 60; rgb[2] = 130; } //background 
-	glColor3ub(rgb[0], rgb[1], rgb[2]);
+	Color color;
+	color.a = 0xFF;
+	
+	if (c == 0)	{ CHANGE_RGB_VALUE(color, Yellow		); }
+	if (c == 1)	{ CHANGE_RGB_VALUE(color, YellowDark	); }
+	if (c == 2)	{ CHANGE_RGB_VALUE(color, Green			); }
+	if (c == 3)	{ CHANGE_RGB_VALUE(color, GreenDark		); }
+	if (c == 4)	{ CHANGE_RGB_VALUE(color, Cyan			); }
+	if (c == 5)	{ CHANGE_RGB_VALUE(color, CyanDark		); }
+	if (c == 6)	{ CHANGE_RGB_VALUE(color, Brown			); }
+	if (c == 7)	{ CHANGE_RGB_VALUE(color, BrownDark		); }
+	if (c == 8) { CHANGE_RGB_VALUE(color, DefaultBlue	); }
+
+	glColor3ub(color.r, color.g, color.b);
+	
 	glBegin(GL_POINTS);
 	glVertex2i(x * pixelScale + 2, y * pixelScale + 2);
 	glEnd();
