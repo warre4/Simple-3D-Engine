@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
+#include "color.h"
+
 #define res											1														//0=160x120 1=360x240 4=640x480
 #define SW											160*res													//screen width
 #define SH											120*res													//screen height
@@ -16,12 +18,7 @@
 #define GLSW										(SW*pixelScale)											//OpenGL window width
 #define GLSH										(SH*pixelScale)											//OpenGL window height
 
-#define RGB_A_TO_RGBA(rgb, a)						(rgb << 8) | a
-#define RGBA_TO_RGB(rgba)							(UINT32)rgba >> 8
-
-//------------------------------------------------------------------------------
-
-typedef unsigned char Byte;
+// ---------------------------------------------------------------------------------------------------------------------------
 
 typedef struct
 {
@@ -35,43 +32,10 @@ typedef struct
 	int m;						//move up, down, look up, down
 }Keys; Keys K;
 
-typedef union
-{
-	Byte data[4];
-	struct { Byte r, g, b, a; };
-	struct { Byte x, y, z, w; };
-}Vec4_uint8;
-typedef Vec4_uint8 Color;
+// ---------------------------------------------------------------------------------------------------------------------------
 
-enum HexCode
-{
-	Yellow = 0xFFFF00,
-	YellowDark = 0xA0A000,
-	Green = 0x00FF00,
-	GreenDark = 0x00A000,
-	Cyan = 0x00FFFF,
-	CyanDark = 0x00A0A0,
-	Brown = 0xA06400,
-	BrownDark = 0x6E3200,
-	
-	DefaultBlue = 0x003C82
-};
 
-//------------------------------------------------------------------------------
-
-void SetColorRGBA(Color* pColor, UINT32 rgbaHexCode)
-{
-	pColor->r = rgbaHexCode >> (8 * 3);
-	pColor->g = 0x00FF0000 | rgbaHexCode >> (8 * 2);
-	pColor->b = 0x0000FF00 | rgbaHexCode >> (8 * 1);
-	pColor->a = 0x000000FF;
-}
-void SetColorRGB(Color* pColor, UINT32 rgbHexCode)
-{
-	SetColorRGBA(pColor, RGB_A_TO_RGBA(rgbHexCode, pColor->a));
-}
-
-//------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
 
 void pixel(int x, int y, int c)			//draw a pixel at x/y with rgb
 {
